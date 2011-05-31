@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body>	
+<script src="star_rating.js">	
+</script>
+<script>
+	var widget = new rating_widget(
+	{
+		number_of_stars: 10,
+		initial_value: 7,
+		default_color: 'rgb(200,200,200)',
+		initial_value_color: 'rgb(255,255,0)',
+		final_value_color: 'rgb(255,0,0)',
+		captions: '1,2,3,4,5,6,7,8,9,10',				
+		parentNode: document.body
+	});		
+	
+	Events.add(widget, 'click', function(sender, args)
+	{
+		alert('your rating: ' + args);
+	});
+</script>
+</body>
+</html>
