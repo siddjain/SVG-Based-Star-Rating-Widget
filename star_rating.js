@@ -379,7 +379,8 @@ var rating_widget = function(options)
 	var captions = null;
 	var captions_default_style = 'font-family:sans-serif';		
 	var captions_class_name = '';
-	var on_click;
+	var on_click = null;
+	var disabled = null;
 	if (options)
 	{			
 		captions = options.captions;
@@ -398,7 +399,7 @@ var rating_widget = function(options)
 		}
 		if (options.initial_value)
 		{ 
-			var f = parseFloat(options.initial_value);
+			var f = Math.round(parseFloat(options.initial_value));
 			if (f < 0 || f > n)
 			{
 				throw new Error('initial_value should be between 0 and number_of_stars');
@@ -422,6 +423,7 @@ var rating_widget = function(options)
 			captions_class_name = options.captions_class_name;
 		}		
 		on_click = options.onclick;
+		disabled = options.disabled;
 	}
 	var coordinates= "M 46.296296,51.906272 L 31.916351,42.474649 L 17.502712,51.8547 L 22.029072,35.264028 L 8.654054,24.454438 L 25.831443,23.632463 L 31.978866,7.5717174 L 38.068716,23.65438 L 55.243051,24.537884 L 41.829396,35.299492 L 46.296296,51.906272 z ";
 	var style = "fill-opacity:1;stroke:black;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1";
@@ -452,15 +454,18 @@ var rating_widget = function(options)
 		star.setAttributeNS(null, "style", style);			
 		svg_root.appendChild(star);
 		var box = bbox(star);			
-		if (box) {	helper(box, boxes);		}
-		else	{	helper(star, stars);	}
+		if (!disabled)
+		{
+			if (box) {	attachEventHandlers(box, boxes);		}
+			else	{	attachEventHandlers(star, stars);	}
+		}
 		stars.push(star);
 		boxes.push(box);
 	}
 	initial_state();
 	this.root = root;		
 
-	function helper(e, array)
+	function attachEventHandlers(e, array)
 	{
 		e.onmouseover = function (evt)
 		{
@@ -570,6 +575,7 @@ document.ready = (function()
 			captions: e.getAttribute('captions'),				
 			captions_class_name: e.getAttribute('captions_class_name'),
 			onclick: e.getAttribute('onclick'),
+			disabled: e.getAttribute('disabled'),
 			parentNode: e
 		});			
 	}		
