@@ -317,57 +317,6 @@ function parseColor(color_string, fallback_value)
 	}
 };
 
-var Events = {};
-Events.add = function(e, eventName, listener)
-{
-	if (e && eventName && listener)
-	{
-		e._events = e._events || {};
-		var events = e._events;
-		events[eventName] = events[eventName] || [];
-		events[eventName].push(listener);
-	}
-};
-Events.remove = function(e, eventName, listener)
-{
-	if (e && listener)
-	{
-		var events = e._events;
-		if (events)
-		{
-			var list = events[eventName];
-			if (list)
-			{
-				var copy = [];
-				for(var i = 0; i < list.length; i++)
-				{
-					if (list[i] !== listener)
-					{
-						copy.push(list[i]);
-					}
-				}
-				events[eventName] = copy;
-			}
-		}
-	}
-};
-Events.invoke = function(e, eventName, args)
-{
-	var events = e._events;
-	if (events)
-	{
-		var list = events[eventName];
-		if (list)
-		{
-			var copy = list.slice(0);
-			for(var i = 0; i < copy.length; i++)
-			{
-				copy[i](e, args);
-			}
-		}
-	}
-};
-
 var rating_widget = function(options)
 {
 	var self = this;
@@ -495,12 +444,11 @@ var rating_widget = function(options)
 				array[j].onmouseout = null;
 				array[j].onclick = null;
 			}				
-			Events.invoke(self, 'click', selectedValue);
 			if (on_click && typeof on_click === 'string')
 			{
 				eval(on_click+'(self , selectedValue)');
 			}
-			else
+			else if (typeof on_click === 'function')
 			{
 				on_click(self, selectedValue);
 			}
