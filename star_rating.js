@@ -1,4 +1,4 @@
-/*
+﻿/*
 	star_rating.js - a program to display a SVG based star rating widget
     Copyright (C) 2011  Siddharth Jain <siddjain@live.com>
 
@@ -306,15 +306,16 @@ function RGBColor(color_string)
 
 function parseColor(color_string, fallback_value)
 {
-	var color = new RGBColor(color_string);
-	if (color.ok)
-	{
-		return color.toRGB();
-	}
-	else
-	{
-		return fallback_value;
-	}
+    var ans = fallback_value;
+    if (color_string)
+    {
+        var color = new RGBColor(color_string);
+        if (color.ok)
+        {
+            ans = color.toRGB();
+        }
+    }
+	return ans;
 };
 
 var rating_widget = function(options)
@@ -326,19 +327,19 @@ var rating_widget = function(options)
 	var fv_color = color(255, 0, 0);
 	var default_color = color(200, 200, 200);
 	var captions = null;
-	var captions_default_style = 'font-family:sans-serif';		
+	var captions_default_style = 'font-family:sans-serif';
 	var captions_class_name = '';
 	var on_click = null;
 	var disabled = null;
 	if (options)
-	{			
+	{
 		captions = options.captions;
-		if (captions && typeof captions === 'string')
+		if (typeof captions === 'string')
 		{
 			captions = captions.split(',');
 		}
 		if (options.number_of_stars)
-		{ 
+		{
 			var i = parseInt(options.number_of_stars);
 			if (i <= 0 || i > 10)
 			{
@@ -347,7 +348,7 @@ var rating_widget = function(options)
 			n = i;
 		}
 		if (options.initial_value)
-		{ 
+		{
 			var f = Math.round(parseFloat(options.initial_value));
 			if (f < 0 || f > n)
 			{
@@ -370,16 +371,20 @@ var rating_widget = function(options)
 		if (options.captions_class_name)
 		{
 			captions_class_name = options.captions_class_name;
-		}		
+		}
 		on_click = options.onclick;
 		disabled = options.disabled;
+        if (typeof disabled === 'string')
+        {
+            disabled = disabled.toLowerCase() === 'true'
+        }
 	}
 	var coordinates= "M 46.296296,51.906272 L 31.916351,42.474649 L 17.502712,51.8547 L 22.029072,35.264028 L 8.654054,24.454438 L 25.831443,23.632463 L 31.978866,7.5717174 L 38.068716,23.65438 L 55.243051,24.537884 L 41.829396,35.299492 L 46.296296,51.906272 z ";
 	var style = "fill-opacity:1;stroke:black;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1";
-	var svgns = "http://www.w3.org/2000/svg";		
+	var svgns = "http://www.w3.org/2000/svg";
 	var root = document.createElement('span');
-	var svg_root = document.createElementNS(svgns, "svg");		
-	var caption_node = document.createElement('span');		
+	var svg_root = document.createElementNS(svgns, "svg");
+	var caption_node = document.createElement('span');
 	if (captions_class_name)	{ caption_node.className = captions_class_name;	}
 	else {	caption_node.style.cssText = captions_default_style; }
 	var text_node = document.createTextNode('');
@@ -387,7 +392,7 @@ var rating_widget = function(options)
 	svg_root.setAttributeNS(null, 'width', 21*n);
 	svg_root.setAttributeNS(null, 'height', 25);
 	root.appendChild(svg_root);
-	root.appendChild(caption_node);		
+	root.appendChild(caption_node);
 	if (options && options.parentNode && options.parentNode.appendChild)
 	{
 		options.parentNode.appendChild(root);
@@ -400,9 +405,9 @@ var rating_widget = function(options)
 		var star = document.createElementNS(svgns, "path");
 		star.setAttributeNS(null, "d", coordinates);
 		star.setAttributeNS(null, "transform", transform(0.3947432, 0, 0, 0.414816, 20*i, 1.159472));
-		star.setAttributeNS(null, "style", style);			
+		star.setAttributeNS(null, "style", style);
 		svg_root.appendChild(star);
-		var box = bbox(star);			
+		var box = bbox(star);
 		if (!disabled)
 		{
 			if (box) {	attachEventHandlers(box, boxes);		}
@@ -412,7 +417,7 @@ var rating_widget = function(options)
 		boxes.push(box);
 	}
 	initial_state();
-	this.root = root;		
+	this.root = root;
 
 	function attachEventHandlers(e, array)
 	{
@@ -420,16 +425,16 @@ var rating_widget = function(options)
 		{
 			var flag = true;
 			for(var j = 0; j < stars.length; j++)
-			{					
+			{
 				if (flag) { stars[j].setAttributeNS(null, "fill", fv_color); }
-				else { stars[j].setAttributeNS(null, "fill", default_color); } 					
+				else { stars[j].setAttributeNS(null, "fill", default_color); }
 				if (flag && array[j] === evt.target)
-				{ 
+				{
 					if (captions && captions[j]) { text_node.textContent = captions[j]; }
 					selectedValue = j + 1;
 					flag = false;
-				}					
-			}								
+				}
+			}
 		};
 		e.onmouseout = function (evt)
 		{
@@ -439,22 +444,22 @@ var rating_widget = function(options)
 		e.onclick = function (evt)
 		{
 			for(var j = 0; j < array.length; j++)
-			{					
+			{
 				array[j].onmouseover = null;
 				array[j].onmouseout = null;
 				array[j].onclick = null;
-			}				
-			if (on_click && typeof on_click === 'string')
-			{
-				eval(on_click+'(self , selectedValue)');
 			}
-			else if (typeof on_click === 'function')
-			{
-				on_click(self, selectedValue);
-			}
+            if (typeof on_click === 'string')
+            {
+                eval(on_click+'(self , selectedValue)');
+            }
+            else if (typeof on_click === 'function')
+            {
+                on_click(self, selectedValue);
+            }
 		};
 	};
-			
+
 	function initial_state()
 	{
 		for(var i = 0; i < stars.length; i++)
@@ -470,11 +475,11 @@ var rating_widget = function(options)
 			}
 		}
 	};
-	
+
 	function bbox(e)
-	{		
+	{
 		if (e && e.getBBox && e.getAttributeNS)
-		{	
+		{
 			var box = e.getBBox();
 			var transform = e.getAttributeNS(null, 'transform');
 			if (box.x && box.y && box.width && box.height && transform)
@@ -486,11 +491,11 @@ var rating_widget = function(options)
 				rect.setAttributeNS(null, 'height', box.height);
 				rect.setAttributeNS(null, 'fill', 'rgba(0,0,0,0)');
 				rect.setAttributeNS(null, 'stroke', 'rgba(0,0,0,0)');
-				rect.setAttributeNS(null, 'transform', transform);				
+				rect.setAttributeNS(null, 'transform', transform);
 				e.parentNode.appendChild(rect);
 				return rect;
 			}
-		}		
+		}
 
 		return null;
 	};
@@ -499,7 +504,7 @@ var rating_widget = function(options)
 	{
 		return "rgb(" + r + ", " + g + ", " + b + ")"
 	};
-	
+
 	function transform(a, b, c, d, e, f)
 	{
 		return "matrix(" + a + "," + b + "," + c + "," + d + "," + e + "," + f + ")";
@@ -507,24 +512,24 @@ var rating_widget = function(options)
 };
 
 document.ready = (function()
-{		
+{
 	var array = document.getElementsByClassName('rating_widget');
 	for(var i = 0; i < array.length; i++)
-	{			
+	{
 		var e = array[i];
-		
+
 		var widget = new rating_widget(
 		{
 			number_of_stars: e.getAttribute('number_of_stars') ? e.getAttribute('number_of_stars') : 5,
-			initial_value: e.getAttribute('initial_value'),
+			initial_value: e.getAttribute('value') ? e.getAttribute('value') : 0,
 			default_color: parseColor(e.getAttribute('default_color'), 'rgb(200,200,200)'),
 			initial_value_color: parseColor(e.getAttribute('initial_value_color'), 'rgb(255,255,0)'),
 			final_value_color: parseColor(e.getAttribute('final_value_color'), 'rgb(255,0,0)'),
-			captions: e.getAttribute('captions'),				
+			captions: e.getAttribute('captions'),
 			captions_class_name: e.getAttribute('captions_class_name'),
 			onclick: e.getAttribute('onclick'),
 			disabled: e.getAttribute('disabled'),
 			parentNode: e
-		});			
-	}		
+		});
+	}
 })();
