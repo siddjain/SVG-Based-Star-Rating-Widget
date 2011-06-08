@@ -1,0 +1,4 @@
+This is a SVG based star rating widget. The demo files show how to use the widget. The widget can be customised to provide:
+- custom fill color
+- custom number of stars
+- can be disabled in which case nothing will happen on mouse hover in/out or click
